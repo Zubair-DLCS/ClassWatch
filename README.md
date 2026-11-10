@@ -1,8 +1,15 @@
 # ClassWatch: privacy-first classroom attention
 
-ClassWatch is a small multimodal model that estimates whether a learner is **engaged**, **thinking hard**, or **mind wandering**. It combines webcam features (gaze, head pose, blinks) with activity logs (typing, clicks, scrolling). It keeps the video on the device, and when it is unsure it says **"not sure"** instead of guessing.
+ClassWatch looks at a classroom through a laptop webcam without recording anyone. Its research part is a small multimodal model that estimates whether a learner is **engaged**, **thinking hard**, or **mind wandering**. It combines webcam features (gaze, head pose, blinks) with activity logs (typing, clicks, scrolling). It keeps the video on the device, and when it is unsure it says **"not sure"** instead of guessing.
 
-> **The data in this repository is simulated.** No real student was recorded. The simulator stands in for a real thought-probe study, so that the whole pipeline (features → fusion model → calibrated, cautious alerts) can be built and tested first. The numbers below show how the method behaves, not how well it would work on real learners.
+> **The attention model's data is simulated.** No real student was recorded. The simulator stands in for a real thought-probe study, so that the whole pipeline (features → fusion model → calibrated, cautious alerts) can be built and tested first. The numbers below show how the method behaves, not how well it would work on real learners.
+
+**This repository has two parts:**
+
+| Part | What it is | Run it |
+|---|---|---|
+| **[ClassWatch Live](live/)** | A real-time classroom demo on a laptop webcam: people in view (anonymous IDs), hands raised, heads front/turned/down/away, standing/sitting, phones, door in/out, with faces blurred and nothing saved. | `python live/classwatch_live.py` |
+| **Attention model** (below) | Research prototype: tells *thinking hard* from *mind wandering* by fusing per-learner webcam features with activity logs, with calibration and "not sure". Trained and tested on simulated data. | `python scripts/run_experiments.py` |
 
 ## Why
 
@@ -106,6 +113,9 @@ Or open [`notebooks/colab_quickstart.ipynb`](notebooks/colab_quickstart.ipynb) i
 ## Repository layout
 
 ```
+live/
+  classwatch_live.py   real-time classroom demo (webcam, pose, tracking, cues, dashboard)
+  cues.py              hand raised, head direction, sitting/standing, door counter, smoothing
 src/classattend/
   simulate.py   simulated sessions: 3 states, individual differences, lab vs classroom camera
   data.py       per-learner baseline, global baseline, learner-wise splits
@@ -115,7 +125,7 @@ src/classattend/
 scripts/
   run_experiments.py   every number and figure in this README
   demo_video.py        run the trained model on your own recording
-tests/test_all.py      unit tests (simulator, features, privacy zeroing, missing modality, alert budget)
+tests/                 unit tests (simulator, features, missing modality, alert budget, live-demo cues)
 results/               metrics.json, figures, trained fusion model (seed 0)
 ```
 
