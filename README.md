@@ -141,6 +141,6 @@ results/               metrics.json, figures, trained fusion model (seed 0)
 
 ## Author
 
-**Zubair**, Assistant Professor of Computer Science, Higher Education Department, Khyber Pakhtunkhwa, Pakistan. GitHub: [Zubair-DLCS](https://github.com/Zubair-DLCS)
+**Malak Zubair**, Assistant Professor of Computer Science, G.C.M.S Timergara, Higher Education Department, Khyber Pakhtunkhwa, Pakistan. GitHub: [Zubair-DLCS](https://github.com/Zubair-DLCS)
 
 MIT licence.

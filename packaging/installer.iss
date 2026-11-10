@@ -7,7 +7,7 @@
 AppId={{6B7E3C2A-5F41-4C1B-9E1D-3A8C2F0B7D11}
 AppName=ClassWatch
 AppVersion={#AppVersion}
-AppPublisher=Zubair
+AppPublisher=Malak Zubair, G.C.M.S Timergara
 AppPublisherURL=https://github.com/Zubair-DLCS/ClassWatch
 DefaultDirName={localappdata}\Programs\ClassWatch
 DefaultGroupName=ClassWatch

@@ -108,6 +108,8 @@ def draw_panel(h, stats, trend, fps, blur, door_on, phones_on):
         cv2.polylines(p, [np.stack([xs, ys], 1).astype(np.int32)], False, (120, 230, 120), 2, cv2.LINE_AA)
     y += gh + 26
 
+    text(p, "Developed by Malak Zubair", (16, h - 112), 0.5, (230, 190, 120))
+    text(p, "Assistant Professor, G.C.M.S Timergara", (16, h - 92), 0.45, (190, 160, 110))
     text(p, f"{fps:4.1f} FPS", (16, h - 52), 0.5, (170, 170, 170))
     text(p, ("Faces blurred" if blur else "Blur OFF") + " | nothing saved", (16, h - 30), 0.5,
          (120, 230, 120) if blur else (60, 60, 220))

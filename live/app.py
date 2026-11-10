@@ -20,6 +20,7 @@ if sys.stderr is None:
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 APP = "ClassWatch"
+CREDIT = "Developed by Malak Zubair, Assistant Professor, G.C.M.S Timergara"
 DOORS = {
     "No door counting": None,
     "Door on the right edge": "0.9,0.05,0.9,0.95",
@@ -80,7 +81,8 @@ def launcher(auto_close_ms: int | None = None):
 
     pad = {"padx": 14, "pady": 4}
     tk.Label(root, text="ClassWatch Live", font=("Segoe UI", 18, "bold")).grid(row=0, column=0, columnspan=2, sticky="w", padx=14, pady=(14, 0))
-    tk.Label(root, text="See how the class is doing, without recording anyone.", fg="#555").grid(row=1, column=0, columnspan=2, sticky="w", **pad)
+    tk.Label(root, text="See how the class is doing, without recording anyone.", fg="#555").grid(row=1, column=0, columnspan=2, sticky="w", padx=14, pady=(2, 0))
+    tk.Label(root, text=CREDIT, fg="#2f6db5", font=("Segoe UI", 9, "italic")).grid(row=10, column=0, columnspan=2, sticky="w", padx=14, pady=(0, 6))
 
     tk.Label(root, text="Camera").grid(row=2, column=0, sticky="w", **pad)
     cam = ttk.Combobox(root, state="readonly", width=34, values=[
