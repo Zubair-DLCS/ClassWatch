@@ -6,3 +6,9 @@ results/demo/
 *.avi
 *.mov
 .ipynb_checkpoints/
+build/
+dist/
+*.spec
+models/
+*.pt
+!results/fusion_seed0.pt

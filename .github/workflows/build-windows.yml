@@ -1,0 +1,94 @@
+name: Build Windows app
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies (CPU only)
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+          pip install ultralytics lap opencv-python pyinstaller
+
+      - name: Download the models to bundle
+        run: |
+          mkdir models
+          cd models
+          python -c "from ultralytics import YOLO; YOLO('yolo11n-pose.pt'); YOLO('yolo11n.pt')"
+          dir
+
+      - name: Build ClassWatch.exe
+        run: >
+          pyinstaller live/app.py --name ClassWatch --windowed --noconfirm --clean
+          --icon packaging/classwatch.ico
+          --paths live
+          --collect-all ultralytics
+          --hidden-import lap
+          --add-data "models;models"
+          --add-data "packaging/classwatch.ico;."
+
+      - name: Smoke test the built app (image + short video, no window)
+        shell: pwsh
+        run: |
+          $assets = python -c "import ultralytics, os; print(os.path.join(os.path.dirname(ultralytics.__file__), 'assets'))"
+          python -c "import cv2; img=cv2.imread(r'$assets\bus.jpg'); h,w=img.shape[:2]; vw=cv2.VideoWriter('pan.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 10, (540,h)); [vw.write(img[:, int((w-540)*i/29):int((w-540)*i/29)+540]) for i in range(30)]; vw.release()"
+          $exe = "dist\ClassWatch\ClassWatch.exe"
+          $p = Start-Process $exe -ArgumentList "--source", "$assets\bus.jpg", "--no-show", "--phones", "--save", "$PWD\smoke_image.jpg" -Wait -PassThru
+          $q = Start-Process $exe -ArgumentList "--source", "$PWD\pan.mp4", "--no-show", "--door", "0.5,0,0.5,1", "--log", "$PWD\smoke_counts.csv", "--save", "$PWD\smoke_video.mp4" -Wait -PassThru
+          $err = "$env:USERPROFILE\Documents\ClassWatch\last_error.txt"
+          if (Test-Path $err) { Get-Content $err }
+          Write-Host "image exit $($p.ExitCode), video exit $($q.ExitCode)"
+          if ($p.ExitCode -ne 0 -or $q.ExitCode -ne 0 -or -not (Test-Path smoke_image.jpg) -or -not (Test-Path smoke_counts.csv)) { exit 1 }
+          Get-Content smoke_counts.csv
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-output
+          path: |
+            smoke_image.jpg
+            smoke_counts.csv
+
+      - name: Build the installer
+        shell: pwsh
+        run: |
+          choco install innosetup -y --no-progress
+          $v = if ("${{ github.ref_type }}" -eq "tag") { "${{ github.ref_name }}".TrimStart("v") } else { "0.0.0-dev" }
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=$v" packaging\installer.iss
+          Compress-Archive -Path dist\ClassWatch -DestinationPath "dist\ClassWatch-portable-$v.zip"
+          dir dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ClassWatch-windows
+          path: |
+            dist/ClassWatch-Setup-*.exe
+            dist/ClassWatch-portable-*.zip
+
+      - name: Publish release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/ClassWatch-Setup-*.exe
+            dist/ClassWatch-portable-*.zip
+          body: |
+            **Download `ClassWatch-Setup-*.exe`, run it, then click the ClassWatch icon on your desktop.**
+
+            No Python needed. Works offline (models included). Faces are blurred and nothing is recorded.
+            Windows may show "Windows protected your PC" because the app is not code-signed: click **More info → Run anyway**.
+
+            `ClassWatch-portable-*.zip` is the same app without installing: unzip and double-click `ClassWatch.exe`.

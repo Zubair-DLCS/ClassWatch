@@ -24,6 +24,8 @@ from __future__ import annotations
 
 import argparse
 import csv
+import os
+import sys
 import time
 from collections import deque
 from pathlib import Path
@@ -113,11 +115,21 @@ def draw_panel(h, stats, trend, fps, blur, door_on, phones_on):
     return p
 
 
+def asset(name: str) -> str:
+    """Model files bundled inside the Windows app, else the name (Ultralytics downloads it)."""
+    for base in (getattr(sys, "_MEIPASS", None), os.path.dirname(os.path.abspath(__file__))):
+        if base:
+            for p in (os.path.join(base, "models", name), os.path.join(base, name)):
+                if os.path.exists(p):
+                    return p
+    return name
+
+
 def parse_source(s: str):
     return int(s) if s.isdigit() else s
 
 
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--source", default="0", help="camera index (0, 1, ...) or a video/image file")
     ap.add_argument("--model", default="yolo11n-pose.pt", help="pose model (n = fastest, s/m = more accurate)")
@@ -130,22 +142,28 @@ def main():
     ap.add_argument("--save", default=None, help="save the annotated output (video or image) - for testing")
     ap.add_argument("--no-show", action="store_true", help="run without a window")
     ap.add_argument("--max-frames", type=int, default=0)
-    a = ap.parse_args()
+    a = ap.parse_args(argv)
 
     from ultralytics import YOLO
-    pose = YOLO(a.model)
-    det = YOLO("yolo11n.pt") if a.phones else None
+    pose = YOLO(asset(a.model))
+    det = YOLO(asset("yolo11n.pt")) if a.phones else None
 
     src = parse_source(a.source)
     single_image = isinstance(src, str) and Path(src).suffix.lower() in IMAGE_EXT
     cap = None
     if not single_image:
-        cap = cv2.VideoCapture(src)
+        if isinstance(src, int) and sys.platform == "win32":
+            cap = cv2.VideoCapture(src, cv2.CAP_DSHOW)  # opens laptop cameras much faster on Windows
+            if not cap.isOpened():
+                cap = cv2.VideoCapture(src)
+        else:
+            cap = cv2.VideoCapture(src)
         if isinstance(src, int):
             cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
             cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
         if not cap.isOpened():
-            raise SystemExit(f"could not open source {a.source!r}")
+            raise SystemExit(f"Could not open camera or file {a.source!r}. "
+                             "Check that no other app (Zoom, Teams, Camera) is using it.")
 
     smooth = Smoother()
     door = None
@@ -268,6 +286,8 @@ def main():
             cv2.imshow(win, out)
             k = cv2.waitKey(0 if single_image else 1) & 0xFF
             if k in (ord("q"), 27):
+                break
+            if cv2.getWindowProperty(win, cv2.WND_PROP_VISIBLE) < 1:
                 break
             if k == ord("b"):
                 blur = not blur
