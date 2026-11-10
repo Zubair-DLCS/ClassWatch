@@ -1,5 +1,9 @@
 # ClassWatch Live: classroom demo on a laptop webcam
 
+| Start window | Live view (test photo) |
+|---|---|
+| ![start window](../docs/screenshots/start_window.png) | ![live view](../docs/screenshots/live_view_test.jpg) |
+
 Point your laptop webcam at the class and run one command. ClassWatch Live shows, in real time:
 
 | On screen | How it is worked out |
