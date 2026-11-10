@@ -2,6 +2,11 @@ name: Build Windows app
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish as a release (e.g. 1.0.0). Leave empty for a test build."
+        required: false
+        default: ""
   push:
     tags: ["v*"]
 
@@ -71,7 +76,7 @@ jobs:
         shell: pwsh
         run: |
           choco install innosetup -y --no-progress
-          $v = if ("${{ github.ref_type }}" -eq "tag") { "${{ github.ref_name }}".TrimStart("v") } else { "0.0.0-dev" }
+          $v = if ("${{ github.ref_type }}" -eq "tag") { "${{ github.ref_name }}".TrimStart("v") } elseif ("${{ inputs.version }}" -ne "") { "${{ inputs.version }}" } else { "0.0.0-dev" }
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=$v" packaging\installer.iss
           Compress-Archive -Path dist\ClassWatch -DestinationPath "dist\ClassWatch-portable-$v.zip"
           dir dist
@@ -84,9 +89,12 @@ jobs:
             dist/ClassWatch-portable-*.zip
 
       - name: Publish release
-        if: github.ref_type == 'tag'
+        if: github.ref_type == 'tag' || inputs.version != ''
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || format('v{0}', inputs.version) }}
+          name: ClassWatch ${{ github.ref_type == 'tag' && github.ref_name || format('v{0}', inputs.version) }}
+          target_commitish: ${{ github.sha }}
           files: |
             dist/ClassWatch-Setup-*.exe
             dist/ClassWatch-portable-*.zip

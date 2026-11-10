@@ -25,7 +25,7 @@ Point your laptop webcam at the class and run one command. ClassWatch Live shows
 The models are included, so it works without internet. Counts you choose to save, and any error report, go to `Documents\ClassWatch`.
 A portable version (`ClassWatch-portable-….zip`) runs without installing: unzip it and double-click `ClassWatch.exe`.
 
-The app is built and tested automatically on a Windows machine by GitHub Actions ([workflow](../.github/workflows/build-windows.yml)). To publish a new version, push a tag such as `v1.0.1`.
+The app is built and tested automatically on a Windows machine by GitHub Actions ([workflow](../.github/workflows/build-windows.yml)). To publish a new version, open Actions → *Build Windows app* → *Run workflow* and enter a version such as `1.0.1` (or push a tag `v1.0.1`).
 
 ## Run it from source (Windows, macOS or Linux)
 
