@@ -7,6 +7,10 @@ on:
         description: "Version to publish as a release (e.g. 1.0.0). Leave empty for a test build."
         required: false
         default: ""
+      screenshots:
+        description: "Commit screenshots of the app to docs/screenshots"
+        type: boolean
+        default: false
   push:
     tags: ["v*"]
 
@@ -64,6 +68,19 @@ jobs:
           Write-Host "image exit $($p.ExitCode), video exit $($q.ExitCode)"
           if ($p.ExitCode -ne 0 -or $q.ExitCode -ne 0 -or -not (Test-Path smoke_image.jpg) -or -not (Test-Path smoke_counts.csv)) { exit 1 }
           Get-Content smoke_counts.csv
+
+      - name: Commit screenshots
+        if: inputs.screenshots
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force docs\screenshots | Out-Null
+          Copy-Item "$env:USERPROFILE\Documents\ClassWatch\start_window.png" docs\screenshots\start_window.png
+          Copy-Item smoke_image.jpg docs\screenshots\live_view_test.jpg
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/screenshots
+          git commit -m "Screenshots from the Windows build"
+          git push
 
       - uses: actions/upload-artifact@v4
         with:

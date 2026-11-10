@@ -153,7 +153,19 @@ def launcher(auto_close_ms: int | None = None):
                     activebackground="#24578f", activeforeground="white", relief="flat", padx=18, pady=6, command=start)
     btn.grid(row=8, column=0, columnspan=2, pady=(6, 6))
     root.bind("<Return>", lambda _e: start())
-    if auto_close_ms:  # used by the automatic build test
+    if auto_close_ms:  # used by the automatic build test: screenshot the window, then close
+        def snap():
+            try:
+                from PIL import ImageGrab
+                root.update()
+                x, y = root.winfo_rootx(), root.winfo_rooty()
+                w, h = root.winfo_width(), root.winfo_height()
+                folder = Path.home() / "Documents" / APP
+                folder.mkdir(parents=True, exist_ok=True)
+                ImageGrab.grab(bbox=(x - 8, y - 32, x + w + 8, y + h + 8)).save(folder / "start_window.png")
+            except Exception:
+                pass
+        root.after(auto_close_ms - 500, snap)
         root.after(auto_close_ms, root.destroy)
     root.mainloop()
 
