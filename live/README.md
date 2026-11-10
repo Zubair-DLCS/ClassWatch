@@ -16,13 +16,25 @@ Point your laptop webcam at the class and run one command. ClassWatch Live shows
 
 **Read the cues as hints, not judgements.** "Head down" can mean writing, reading or sleeping. "Turned" can mean talking to a neighbour or looking at a side board. Telling these apart is the open research problem in the main project.
 
-## Run it on your laptop (Windows, macOS or Linux)
+## Windows: one-click app (no Python needed)
+
+1. Open the [Releases page](https://github.com/Zubair-DLCS/ClassWatch/releases/latest) and download **`ClassWatch-Setup-….exe`**.
+2. Run it. Windows may say *"Windows protected your PC"* because the app is not code-signed: click **More info → Run anyway**. No admin rights are needed.
+3. Click the **ClassWatch** icon on your desktop. A small start window opens: choose the camera, tick the options you want, and press **Start ClassWatch**.
+
+The models are included, so it works without internet. Counts you choose to save, and any error report, go to `Documents\ClassWatch`.
+A portable version (`ClassWatch-portable-….zip`) runs without installing: unzip it and double-click `ClassWatch.exe`.
+
+The app is built and tested automatically on a Windows machine by GitHub Actions ([workflow](../.github/workflows/build-windows.yml)). To publish a new version, push a tag such as `v1.0.1`.
+
+## Run it from source (Windows, macOS or Linux)
 
 You need Python 3.9 or newer. In a terminal, from the repository folder:
 
 ```bash
 pip install -r live/requirements.txt
-python live/classwatch_live.py
+python live/app.py                # start window
+python live/classwatch_live.py    # straight to the camera
 ```
 
 The first run downloads two small models (about 6 MB each). After that it works offline. On Windows you can also double-click `live/start_classwatch.bat`.

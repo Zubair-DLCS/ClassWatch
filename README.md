@@ -8,7 +8,7 @@ ClassWatch looks at a classroom through a laptop webcam without recording anyone
 
 | Part | What it is | Run it |
 |---|---|---|
-| **[ClassWatch Live](live/)** | A real-time classroom demo on a laptop webcam: people in view (anonymous IDs), hands raised, heads front/turned/down/away, standing/sitting, phones, door in/out, with faces blurred and nothing saved. | `python live/classwatch_live.py` |
+| **[ClassWatch Live](live/)** | A real-time classroom demo on a laptop webcam: people in view (anonymous IDs), hands raised, heads front/turned/down/away, standing/sitting, phones, door in/out, with faces blurred and nothing saved. | Windows: [download the installer](https://github.com/Zubair-DLCS/ClassWatch/releases/latest) and click the desktop icon. Or `python live/app.py` |
 | **Attention model** (below) | Research prototype: tells *thinking hard* from *mind wandering* by fusing per-learner webcam features with activity logs, with calibration and "not sure". Trained and tested on simulated data. | `python scripts/run_experiments.py` |
 
 ## Why
@@ -114,6 +114,7 @@ Or open [`notebooks/colab_quickstart.ipynb`](notebooks/colab_quickstart.ipynb) i
 
 ```
 live/
+  app.py               start window (the Windows app opens this)
   classwatch_live.py   real-time classroom demo (webcam, pose, tracking, cues, dashboard)
   cues.py              hand raised, head direction, sitting/standing, door counter, smoothing
 src/classattend/
@@ -125,6 +126,8 @@ src/classattend/
 scripts/
   run_experiments.py   every number and figure in this README
   demo_video.py        run the trained model on your own recording
+packaging/             app icon and Windows installer script
+.github/workflows/     builds, tests and publishes the Windows app
 tests/                 unit tests (simulator, features, missing modality, alert budget, live-demo cues)
 results/               metrics.json, figures, trained fusion model (seed 0)
 ```

@@ -37,6 +37,7 @@ jobs:
           --icon packaging/classwatch.ico
           --paths live
           --collect-all ultralytics
+          --collect-all torchvision
           --hidden-import lap
           --add-data "models;models"
           --add-data "packaging/classwatch.ico;."
