@@ -50,6 +50,10 @@ jobs:
           $exe = "dist\ClassWatch\ClassWatch.exe"
           $p = Start-Process $exe -ArgumentList "--source", "$assets\bus.jpg", "--no-show", "--phones", "--save", "$PWD\smoke_image.jpg" -Wait -PassThru
           $q = Start-Process $exe -ArgumentList "--source", "$PWD\pan.mp4", "--no-show", "--door", "0.5,0,0.5,1", "--log", "$PWD\smoke_counts.csv", "--save", "$PWD\smoke_video.mp4" -Wait -PassThru
+          $w = Start-Process $exe -ArgumentList "--check-window" -Wait -PassThru
+          $okw = Test-Path "$env:USERPROFILE\Documents\ClassWatch\window_check_ok.txt"
+          Write-Host "start window exit $($w.ExitCode), opened: $okw"
+          if ($w.ExitCode -ne 0 -or -not $okw) { exit 1 }
           $err = "$env:USERPROFILE\Documents\ClassWatch\last_error.txt"
           if (Test-Path $err) { Get-Content $err }
           Write-Host "image exit $($p.ExitCode), video exit $($q.ExitCode)"

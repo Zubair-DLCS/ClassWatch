@@ -64,7 +64,7 @@ def run_live(args: list[str]) -> str | None:
     return err
 
 
-def launcher():
+def launcher(auto_close_ms: int | None = None):
     import tkinter as tk
     from tkinter import filedialog, messagebox, ttk
 
@@ -153,10 +153,17 @@ def launcher():
                     activebackground="#24578f", activeforeground="white", relief="flat", padx=18, pady=6, command=start)
     btn.grid(row=8, column=0, columnspan=2, pady=(6, 6))
     root.bind("<Return>", lambda _e: start())
+    if auto_close_ms:  # used by the automatic build test
+        root.after(auto_close_ms, root.destroy)
     root.mainloop()
 
 
 def main():
+    if sys.argv[1:] == ["--check-window"]:  # build test: open the start window, close it, report
+        launcher(auto_close_ms=1500)
+        (Path.home() / "Documents" / APP).mkdir(parents=True, exist_ok=True)
+        (Path.home() / "Documents" / APP / "window_check_ok.txt").write_text("ok")
+        return
     if len(sys.argv) > 1:  # direct start with options, no window
         err = run_live(sys.argv[1:])
         if err:
