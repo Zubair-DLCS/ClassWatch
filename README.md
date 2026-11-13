@@ -11,6 +11,26 @@ ClassWatch looks at a classroom through a laptop webcam without recording anyone
 | **[ClassWatch Live](live/)** | A real-time classroom demo on a laptop webcam: people in view (anonymous IDs), hands raised, heads front/turned/down/away, standing/sitting, phones, door in/out, with faces blurred and nothing saved. | Windows: [download the installer](https://github.com/Zubair-DLCS/ClassWatch/releases/latest) and click the desktop icon. Or `python live/app.py` |
 | **Attention model** (below) | Research prototype: tells *thinking hard* from *mind wandering* by fusing per-learner webcam features with activity logs, with calibration and "not sure". Trained and tested on simulated data. | `python scripts/run_experiments.py` |
 
+## Multimodal learning analytics and adaptive learning environments
+
+ClassWatch sits where two research areas meet.
+
+**Multimodal learning analytics.** No single signal tells you whether a learner is with the lesson, so ClassWatch combines several:
+
+- The **attention model** fuses webcam features (gaze, head pose, eye openness, blinks) with interaction logs (keystrokes, mouse, clicks, idle time, scrolling back, tab switches). It is trained with modality dropout, so it still works when the camera or the logs are missing.
+- The **live demo** adds classroom-level signals: people in view, raised hands, head direction and posture, aggregated for the whole class.
+
+**Adaptive learning environments.** A detector only helps if something sensible happens next. The attention model is built as the sensing layer of an adaptive environment, and its decision layer is part of the design:
+
+| Model output | Suggested response | Why |
+|---|---|---|
+| Engaged | nothing | do not interrupt learning |
+| Thinking hard | nothing; give time | interrupting a thinker is the costliest mistake |
+| Mind wandering, above the alert threshold | a quiet, private nudge: a short question, a pause, or a hint to the teacher | the threshold is set so that at most ~10% of thinkers are flagged |
+| "Not sure" (confidence below 60%) | nothing | a confident wrong answer is worse than no answer |
+
+**Not built yet:** the learning environment that delivers these responses, and a study testing whether they actually help learning. Both are natural next steps.
+
 ## Why
 
 Every teacher wants to know two things during a lesson: who is with me, and who has understood? Students rarely say so. You can read faces, but you cannot watch every face while you teach, and staring at students makes them nervous.
